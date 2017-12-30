@@ -1,7 +1,10 @@
 import picamera
 import time
 import os
+import threading
 from constants import APP_DIR
+from Objects.Timer import Timer
+
 
 class CameraController():
 
@@ -16,6 +19,8 @@ class CameraController():
 
     # Stores last recorded video file's path
     _last_recorded_file_path = None
+
+    _video_file_path = None
 
     def __init__(self):
         # Create the camera object
