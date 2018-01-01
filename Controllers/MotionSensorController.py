@@ -3,7 +3,7 @@ import threading
 import RPi.GPIO as GPIO
 
 
-class MotionSensorController(threading.Thread):
+class MotionSensorController:
 
     # CONSTANTS
     INPUT_PIN_NUMBER = 18
@@ -13,13 +13,14 @@ class MotionSensorController(threading.Thread):
     # Callback function that will be called when the sensor detects motion
     cb = None
 
+    # The thread
+    thr = None
+
     def __init__(self, callback=None):
         """
         :param callback: A callback that will be called when the sensor detects motion. Takes no parameters.
         :return:
         """
-
-        super().__init__(target=self._activate)
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.INPUT_PIN_NUMBER, GPIO.IN)
@@ -36,8 +37,9 @@ class MotionSensorController(threading.Thread):
         :return:
         """
 
+        self.thr = threading.Thread(target=self._activate)
         self.is_active = True
-        self.start()
+        self.thr.start()
 
     def deactivate(self):
         """
@@ -45,8 +47,11 @@ class MotionSensorController(threading.Thread):
         :return:
         """
 
-        self.is_active = False
-        self.join()
+        if self.is_active:
+            self.is_active = False
+            self.thr.join()
+
+        self.thr = None
 
     def _activate(self):
         """

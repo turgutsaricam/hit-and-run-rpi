@@ -27,8 +27,11 @@ class AccelerometerController:
         self.thr.start()
 
     def deactivate(self):
-        self.is_active = False
-        self.thr.join()
+        if self.is_active:
+            self.is_active = False
+            self.thr.join()
+
+        self.thr = None
 
     def _activate(self):
         print("Accelerometer readings are activated...")

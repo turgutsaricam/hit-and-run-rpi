@@ -70,7 +70,7 @@ class HitDetector:
         l = len(self.sensor_data)
 
         # We need at least 2 entries in sensor data.
-        if l < 2:
+        if l < self.window_length:
             return
 
         # Loop over the sensor data starting from the last one.

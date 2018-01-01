@@ -97,3 +97,6 @@ class CameraController():
             return
 
         os.remove(self._last_recorded_file_path)
+
+    def get_last_recorded_file_path(self):
+        return self._last_recorded_file_path
