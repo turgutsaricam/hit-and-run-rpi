@@ -1,5 +1,6 @@
 import dropbox
 import os
+from env.env import dropbox_credentials
 
 
 class DropboxHandler:
@@ -7,11 +8,11 @@ class DropboxHandler:
     """
 
     # Dropbox app credentials
-    APP_KEY = 'ci7ep1rk2cirvd8'
-    APP_SECRET = 'delirr9sclkgxyb'
+    APP_KEY = dropbox_credentials['app_key']
+    APP_SECRET = dropbox_credentials['app_secret']
 
     # Access token was generated manually in the app console on Dropbox.
-    ACCESS_TOKEN = 'KEkmBtQjsiUAAAAAAAAoi4TpDwBCLx_B895nDFSb6mFCLj8RxcuC_69EmcMPzv0a'
+    ACCESS_TOKEN = dropbox_credentials['access_token']
 
     dbx = None
 
