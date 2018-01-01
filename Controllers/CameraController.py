@@ -14,6 +14,8 @@ class CameraController():
 
     # PRIVATE INSTANCE VARIABLES
 
+    _camera = None
+
     # Stores the state of the camera for video recording. True if the camera is recording currently. Otherwise, false.
     _is_recording = False
 
@@ -23,8 +25,7 @@ class CameraController():
     _video_file_path = None
 
     def __init__(self):
-        # Create the camera object
-        self.camera = picamera.PiCamera()
+        pass
 
     def record_video(self, duration_in_seconds=5):
         """
@@ -48,6 +49,10 @@ class CameraController():
         :return:
         """
 
+        # Create the camera object
+        if self._camera is None:
+            self._camera = picamera.PiCamera()
+
         # If we are currently recording, do not start another recording.
         if self._is_recording:
             return
@@ -59,7 +64,7 @@ class CameraController():
 
         self._video_file_path = os.path.join(APP_DIR, self.VIDEO_DIR, video_file_name)
 
-        self.camera.start_recording(self._video_file_path)
+        self._camera.start_recording(self._video_file_path)
 
     def stop_recording(self):
         """
@@ -71,7 +76,11 @@ class CameraController():
             return None
 
         # First, stop the recording.
-        self.camera.stop_recording()
+        self._camera.stop_recording()
+
+        # Deactivate the camera.
+        self._camera.close()
+        self._camera = None
 
         # We are not recording from now on.
         self._is_recording = False
@@ -93,7 +102,7 @@ class CameraController():
         :return:
         """
 
-        if self._last_recorded_file_path is None:
+        if self._last_recorded_file_path is None or not os.path.isfile(self._last_recorded_file_path):
             return
 
         os.remove(self._last_recorded_file_path)
