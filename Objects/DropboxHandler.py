@@ -1,5 +1,8 @@
 import dropbox
 import os
+
+import socket
+
 from env.env import dropbox_credentials
 
 
@@ -27,7 +30,7 @@ class DropboxHandler:
     def upload_file(self, file_path):
         """
         :param file_path: Path of the file to be uploaded to Dropbox
-        :return: Link of the uploaded file
+        :return: Link of the uploaded file or None if there happens an error
         """
         if not os.path.isfile(file_path):
             raise FileNotFoundError("File not found.")
@@ -38,33 +41,40 @@ class DropboxHandler:
         # with open(file_path, "rb") as f:
         #     self.dbx.files_upload(f.read(), dest_path, mute=True)
 
-        with open(file_path, 'rb') as f:
-            file_size = os.path.getsize(file_path)
+        try:
 
-            chunk_size = 1 * 1024 * 1024
+            with open(file_path, 'rb') as f:
+                file_size = os.path.getsize(file_path)
 
-            if file_size <= chunk_size:
-                self.dbx.files_upload(f.read(), dest_path)
+                chunk_size = 1 * 1024 * 1024
 
-            else:
-                upload_session_start_result = self.dbx.files_upload_session_start(f.read(chunk_size))
-                cursor = dropbox.files.UploadSessionCursor(session_id=upload_session_start_result.session_id,
-                                                           offset=f.tell())
-                commit = dropbox.files.CommitInfo(path=dest_path)
+                if file_size <= chunk_size:
+                    self.dbx.files_upload(f.read(), dest_path)
 
-                while f.tell() < file_size:
-                    if (file_size - f.tell()) <= chunk_size:
-                        self.dbx.files_upload_session_finish(f.read(chunk_size),
-                                                        cursor,
-                                                        commit)
-                    else:
-                        self.dbx.files_upload_session_append_v2(f.read(chunk_size), cursor)
-                        cursor.offset = f.tell()
+                else:
+                    upload_session_start_result = self.dbx.files_upload_session_start(f.read(chunk_size))
+                    cursor = dropbox.files.UploadSessionCursor(session_id=upload_session_start_result.session_id,
+                                                               offset=f.tell())
+                    commit = dropbox.files.CommitInfo(path=dest_path)
 
-        # Create a shared link
-        shared_link = self.dbx.sharing_create_shared_link_with_settings(dest_path)
+                    while f.tell() < file_size:
+                        if (file_size - f.tell()) <= chunk_size:
+                            self.dbx.files_upload_session_finish(f.read(chunk_size),
+                                                            cursor,
+                                                            commit)
+                        else:
+                            self.dbx.files_upload_session_append_v2(f.read(chunk_size), cursor)
+                            cursor.offset = f.tell()
 
-        return shared_link.url
+            # Create a shared link
+            shared_link = self.dbx.sharing_create_shared_link_with_settings(dest_path)
+
+            return shared_link.url
+
+        except socket.timeout as e:
+            print("There was an error when uploading file to Dropbox:")
+            print(str(e))
+            return None
 
     # def init_authorization(self):
     #     """ Initializes authorization process and saves the received access token.

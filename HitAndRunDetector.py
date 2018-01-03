@@ -164,10 +164,17 @@ class HitAndRunDetector:
 
         dbx_handler = DropboxHandler()
         file_dropbox_url = dbx_handler.upload_file(file_path)
-        print('File uploaded: {0}'.format(file_dropbox_url))
 
-        # Store the video URLs in the instance variable
-        self.video_urls = [file_dropbox_url]
+        # If we managed to upload the file to Dropbox, then get it is OK to continue with sending the email.
+        if file_dropbox_url is not None:
+            print('File uploaded: {0}'.format(file_dropbox_url))
+
+            # Store the video URLs in the instance variable
+            self.video_urls = [file_dropbox_url]
+
+        # Otherwise, just shut down, which will restart everything.
+        else:
+            self.shut_down = True
 
     def send_email(self, urls):
         """ Sends an email to the car's owner, which includes the provided URLs.
