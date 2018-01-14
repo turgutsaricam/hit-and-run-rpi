@@ -8,6 +8,7 @@ import time
 from Objects.HitDetector import HitDetector
 from Objects.Timer import Timer
 from Objects.DropboxHandler import DropboxHandler
+from env.env import smtp_credentials
 
 
 class HitAndRunDetector:
@@ -21,15 +22,15 @@ class HitAndRunDetector:
     # How many seconds more the camera should keep recording after a hit is detected
     record_duration_after_hit_in_seconds = 5
 
-    SMTP_USER       = 'turgutsaricam.raspberrypi@gmail.com'     # Email address from which the emails will be sent
-    SMTP_PASS       = 'raspberry'                               # Password of the email address
-    TO_ADDRESS      = 'turgutsaricam@gmail.com'                 # Target email. The emails will be sent to this address.
-    MAIL_SUBJECT    = 'Your car has been hit!'                  # Subject of the email.
+    SMTP_USER       = smtp_credentials['SMTP_USER']
+    SMTP_PASS       = smtp_credentials['SMTP_PASS']
+    TO_ADDRESS      = smtp_credentials['TO_ADDRESS']
+    MAIL_SUBJECT    = smtp_credentials['MAIL_SUBJECT']
 
     SMTP_HOST = 'smtp.gmail.com'
     SMTP_PORT = 587
 
-    # No need to make changes in below variables.
+    # No need to make changes in the variables below.
 
     motion_sensor_controller = None  # type: MotionSensorController
     camera_controller = None  # type: CameraController
